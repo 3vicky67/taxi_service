@@ -1,0 +1,35 @@
+@Metadata.layer: #CORE
+@UI: {
+  headerInfo: { typeName: 'Driver',
+                typeNamePlural: 'Drivers',
+                title: { type: #STANDARD, value: 'DriverName' },
+                description: { type: #STANDARD, value: 'DriverId' } }
+}
+annotate view ZC_CIT_DRIVER with 
+{
+  @UI.facet: [ { id: 'DriverDetails', purpose: #STANDARD, type: #IDENTIFICATION_REFERENCE, label: 'Driver Details', position: 10 } ]
+
+  @UI.lineItem: [{ position: 10, label: 'Driver ID' }]
+  @UI.identification: [{ position: 10, label: 'Driver ID' }]
+  DriverId; 
+
+  @UI.lineItem: [{ position: 20, label: 'Driver Name' }]
+  @UI.identification: [{ position: 20, label: 'Driver Name' }]
+  DriverName;
+
+  @UI.lineItem: [{ position: 30, label: 'License No.' }]
+  @UI.identification: [{ position: 30, label: 'License No.' }]
+  LicenseNumber;
+
+  @UI.lineItem: [{ position: 40, label: 'Phone Number' }]
+  @UI.identification: [{ position: 40, label: 'Phone Number' }]
+  PhoneNumber;
+
+  @UI.lineItem: [{ position: 50, label: 'Vehicle Number' }]
+  @UI.identification: [{ position: 50, label: 'Vehicle Number' }]
+  VehicleNumber;
+  
+  @UI.lineItem: [{ position: 60, label: 'Availability' }]
+  @UI.identification: [{ position: 60, label: 'Availability' }]
+  AvailabilityStatus;
+}

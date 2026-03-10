@@ -1,0 +1,102 @@
+@Metadata.layer: #CORE
+@UI: {
+  headerInfo: { typeName: 'Booking',
+                typeNamePlural: 'Bookings',
+                title: { type: #STANDARD, value: 'BookingId' },
+                description: { type: #STANDARD, value: 'CustomerName' } }
+}
+annotate view ZC_CIT_BOOKING with 
+{
+  @UI.facet: [
+    { id: 'BookingDetails', 
+      purpose: #STANDARD, 
+      type: #FIELDGROUP_REFERENCE, 
+      label: 'Booking Details', 
+      targetQualifier: 'BookingDetailsGroup', 
+      position: 10 },
+      
+    { id: 'TripInfo', 
+      purpose: #STANDARD, 
+      type: #FIELDGROUP_REFERENCE, 
+      label: 'Trip Info', 
+      targetQualifier: 'TripInfoGroup', 
+      position: 20 }
+  ]
+
+  @UI.hidden: true
+  BookingUuid;
+
+  @UI.lineItem: [{ position: 10, label: 'Booking No.' }]
+  @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 10, label: 'Booking No.' }]
+  BookingId;
+
+  @UI.lineItem: [{ position: 20, label: 'Customer Name' }]
+  @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 20, label: 'Customer Name' }]
+  CustomerName;
+
+  @UI.lineItem: [{ position: 30, label: 'Pickup Location' }]
+  @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 30, label: 'Pickup Location' }]
+  PickupLocation;
+
+  @UI.lineItem: [{ position: 40, label: 'Drop Location' }]
+  @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 40, label: 'Drop Location' }]
+  DropLocation;
+
+  @UI.lineItem: [{ position: 50, label: 'Booking Date' }]
+  @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 50, label: 'Booking Date' }]
+  BookingDate;
+
+  @UI.lineItem: [{ position: 60, label: 'Status' }]
+  @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 60, label: 'Status' }]
+  Status;
+
+  @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 70, label: 'Currency' }]
+  CurrencyCode;
+
+  @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 80, label: 'Created By' }]
+  CreatedBy;
+
+  @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 90, label: 'Created At' }]
+  CreatedAt;
+
+  @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 100, label: 'Last Changed By' }]
+  LastChangedBy;
+
+  @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 110, label: 'Last Changed At' }]
+  LastChangedAt;
+
+  // --- Trip Info Facet (Tab 2) ---
+  
+  @UI.fieldGroup: [{ qualifier: 'TripInfoGroup', position: 10, label: 'Driver ID' }]
+  DriverId;
+  
+
+  @UI.fieldGroup: [{ qualifier: 'TripInfoGroup', position: 20, label: 'Vehicle Number' }]
+  VehicleNumber;
+
+  @UI.fieldGroup: [{ qualifier: 'TripInfoGroup', position: 30, label: 'Fare Amount' }]
+  FareAmount;
+  
+  // Add this inside your MDE file
+
+  @UI.lineItem:       [{ position: 55 }] // Adjust position number as needed
+  @UI.identification: [{ position: 55 }]
+  DriverName;
+
+  @UI.lineItem:       [{ position: 56 }] 
+  @UI.identification: [{ position: 56 }]
+  PhoneNumber;
+
+  // --- Action Buttons (Visible at the top right) ---
+  @UI.lineItem: [
+    { type: #FOR_ACTION, dataAction: 'AssignDriver', label: 'Assign Driver', position: 100 },
+    { type: #FOR_ACTION, dataAction: 'StartTrip', label: 'Start Trip', position: 110 },
+    { type: #FOR_ACTION, dataAction: 'CompleteTrip', label: 'Complete Trip', position: 120 }
+  ]
+  @UI.identification: [
+    { type: #FOR_ACTION, dataAction: 'AssignDriver', label: 'Assign Driver', position: 100 },
+    { type: #FOR_ACTION, dataAction: 'StartTrip', label: 'Start Trip', position: 110 },
+    { type: #FOR_ACTION, dataAction: 'CompleteTrip', label: 'Complete Trip', position: 120 }
+  ]
+  LocalLastChangedAt; 
+}

@@ -1,0 +1,37 @@
+managed implementation in class zbp_i_cit_driver unique;
+strict ( 2 );
+// Draft removed from here
+
+define behavior for ZI_CIT_DRIVER alias Driver
+persistent table zcit_driver
+// Draft table removed from here
+lock master
+authorization master ( none )
+etag master LocalLastChangedAt
+{
+  create;
+  update;
+  delete;
+
+  field ( mandatory : create, readonly : update ) DriverId;
+
+  field ( readonly ) CreatedBy, CreatedAt, LastChangedBy, LastChangedAt, LocalLastChangedAt;
+  field ( mandatory ) DriverName, PhoneNumber, VehicleNumber, AvailabilityStatus;
+
+  // All draft actions removed from here
+
+  mapping for zcit_driver
+  {
+    DriverId = driver_id;
+    DriverName = driver_name;
+    LicenseNumber = license_number;
+    PhoneNumber = phone_number;
+    VehicleNumber = vehicle_number;
+    AvailabilityStatus = availability_status;
+    CreatedBy = created_by;
+    CreatedAt = created_at;
+    LastChangedBy = last_changed_by;
+    LastChangedAt = last_changed_at;
+    LocalLastChangedAt = local_last_changed_at;
+  }
+}

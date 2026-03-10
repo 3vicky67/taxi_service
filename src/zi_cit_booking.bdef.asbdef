@@ -1,0 +1,57 @@
+managed implementation in class zbp_i_cit_booking unique;
+strict ( 2 );
+with draft;
+
+define behavior for ZI_CIT_BOOKING alias Booking
+persistent table zcit_booking
+draft table zcit_booking_d
+lock master
+total etag LocalLastChangedAt
+authorization master ( instance )
+etag master LastChangedAt
+{
+  create;
+  update;
+  delete;
+
+  field ( numbering : managed, readonly ) BookingUuid;
+  field ( readonly ) BookingId, Status, CreatedAt, CreatedBy, LastChangedAt, LastChangedBy;
+
+
+  field ( mandatory ) CustomerName, PickupLocation, DropLocation, BookingDate, CurrencyCode;
+
+
+  action AssignDriver result [1] $self;
+  action StartTrip result [1] $self;
+  action CompleteTrip result [1] $self;
+
+
+  determination calculateBookingId on save { create; }
+  determination setInitialStatus on modify { create; }
+
+  draft action Edit;
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare;
+
+  mapping for zcit_booking
+  {
+    BookingUuid = booking_uuid;
+    BookingId = booking_id;
+    CustomerName = customer_name;
+    PickupLocation = pickup_location;
+    DropLocation = drop_location;
+    BookingDate = booking_date;
+    Status = status;
+    CurrencyCode = currency_code;
+    DriverId = driver_id;
+    VehicleNumber = vehicle_number;
+    FareAmount = fare_amount;
+    CreatedBy = created_by;
+    CreatedAt = created_at;
+    LastChangedBy = last_changed_by;
+    LastChangedAt = last_changed_at;
+    LocalLastChangedAt = local_last_changed_at;
+  }
+}

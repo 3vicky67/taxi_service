@@ -1,0 +1,5 @@
+@EndUserText.label: 'Service Definition for Taxi Booking'
+define service ZUI_CIT_TAXI {
+  expose ZC_CIT_BOOKING as Booking;
+  expose ZC_CIT_DRIVER  as Driver;
+}
