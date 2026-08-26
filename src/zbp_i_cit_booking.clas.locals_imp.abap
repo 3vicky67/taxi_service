@@ -19,6 +19,9 @@ CLASS lhc_Booking DEFINITION INHERITING FROM cl_abap_behavior_handler.
     METHODS setInitialStatus FOR DETERMINE ON MODIFY
       IMPORTING keys FOR Booking~setInitialStatus.
 
+    METHODS validateDriverAvailability FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Booking~validateDriverAvailability.
+
 ENDCLASS.
 
 CLASS lhc_Booking IMPLEMENTATION.
@@ -26,24 +29,64 @@ CLASS lhc_Booking IMPLEMENTATION.
   METHOD get_instance_authorizations.
   ENDMETHOD.
 
-  METHOD AssignDriver.
-    MODIFY ENTITIES OF zi_cit_booking IN LOCAL MODE
+ METHOD AssignDriver.
+    " 1. Read the currently selected Driver ID for the booking
+    READ ENTITIES OF zi_cit_booking IN LOCAL MODE
       ENTITY Booking
-         UPDATE FIELDS ( Status )
-         WITH VALUE #( FOR key IN keys ( %tky = key-%tky Status = 'Driver Assigned' ) ).
+        FIELDS ( DriverId )
+        WITH CORRESPONDING #( keys )
+      RESULT DATA(bookings).
 
+    LOOP AT bookings INTO DATA(booking).
+
+      " 2. Fetch the driver's availability from the database
+      SELECT SINGLE availability_status
+        FROM zcit_driver
+        WHERE driver_id = @booking-DriverId
+        INTO @DATA(lv_availability).
+
+      " 3. CRITICAL CHECK: Block if unavailable
+      " Note: Ensure the database value is actually 'NO' and not 'N' or a boolean.
+      IF lv_availability = 'NO' OR lv_availability = 'No' OR lv_availability = 'no'.
+
+        " This stops the action from making any changes
+        APPEND VALUE #( %tky = booking-%tky ) TO failed-booking.
+
+        " This displays the error message on the UI when the button is clicked
+        APPEND VALUE #( %tky = booking-%tky
+                        %msg = new_message_with_text(
+                                 severity = if_abap_behv_message=>severity-error
+                                 text     = 'Action Canceled: This driver is marked as NO for availability!' )
+                      ) TO reported-booking.
+
+      ELSE.
+        " 4. Driver is available -> Proceed with updating the status
+        MODIFY ENTITIES OF zi_cit_booking IN LOCAL MODE
+          ENTITY Booking
+            UPDATE FIELDS ( Status StatusCriticality )
+            WITH VALUE #( ( %tky              = booking-%tky
+                            Status            = 'Driver Assigned'
+                            StatusCriticality = 2 ) ).
+      ENDIF.
+    ENDLOOP.
+
+    " 5. Read the result to return to the UI
     READ ENTITIES OF zi_cit_booking IN LOCAL MODE
       ENTITY Booking
         ALL FIELDS WITH CORRESPONDING #( keys )
-      RESULT DATA(bookings).
-    result = VALUE #( FOR booking IN bookings ( %tky = booking-%tky %param = booking ) ).
+      RESULT DATA(final_bookings).
+
+    result = VALUE #( FOR b IN final_bookings ( %tky = b-%tky %param = b ) ).
   ENDMETHOD.
 
   METHOD CompleteTrip.
     MODIFY ENTITIES OF zi_cit_booking IN LOCAL MODE
       ENTITY Booking
-         UPDATE FIELDS ( Status )
-         WITH VALUE #( FOR key IN keys ( %tky = key-%tky Status = 'Completed' ) ).
+         UPDATE FIELDS ( Status statuscriticality )
+         WITH VALUE #( FOR key IN keys (
+                         %tky = key-%tky
+                         Status = 'Completed'
+                         StatusCriticality = 3 ) ). " 3 = Green
 
     READ ENTITIES OF zi_cit_booking IN LOCAL MODE
       ENTITY Booking
@@ -55,8 +98,11 @@ CLASS lhc_Booking IMPLEMENTATION.
   METHOD StartTrip.
      MODIFY ENTITIES OF zi_cit_booking IN LOCAL MODE
       ENTITY Booking
-         UPDATE FIELDS ( Status )
-         WITH VALUE #( FOR key IN keys ( %tky = key-%tky Status = 'In Progress' ) ).
+         UPDATE FIELDS ( Status StatusCriticality )
+         WITH VALUE #( FOR key IN keys (
+                         %tky = key-%tky
+                         Status = 'Trip Started'
+                         StatusCriticality = 5 ) ). " 5 = Blue
 
     READ ENTITIES OF zi_cit_booking IN LOCAL MODE
       ENTITY Booking
@@ -64,7 +110,6 @@ CLASS lhc_Booking IMPLEMENTATION.
       RESULT DATA(bookings).
     result = VALUE #( FOR booking IN bookings ( %tky = booking-%tky %param = booking ) ).
   ENDMETHOD.
-
   METHOD calculateBookingId.
     " 1. Read records being saved
     READ ENTITIES OF zi_cit_booking IN LOCAL MODE
@@ -119,4 +164,39 @@ CLASS lhc_Booking IMPLEMENTATION.
                         Status = 'Booked' ) ).
   ENDMETHOD.
 
+  METHOD validateDriverAvailability.
+    " 1. Read the Driver IDs from the bookings being saved
+    READ ENTITIES OF zi_cit_booking IN LOCAL MODE
+      ENTITY Booking
+        FIELDS ( DriverId ) WITH CORRESPONDING #( keys )
+      RESULT DATA(bookings).
+
+    LOOP AT bookings INTO DATA(booking).
+      " Skip if no driver is selected yet
+      CHECK booking-DriverId IS NOT INITIAL.
+
+      " 2. Check driver availability from the driver table
+      SELECT SINGLE availability_status
+        FROM zcit_driver
+        WHERE driver_id = @booking-DriverId
+        INTO @DATA(lv_availability).
+
+      " 3. If unavailable, trigger ERROR to abort the save
+      " Checking upper and lower case just to be safe
+      IF lv_availability = 'NO' OR lv_availability = 'No' OR lv_availability = 'no'.
+
+        " This stops the save!
+        APPEND VALUE #( %tky = booking-%tky ) TO failed-booking.
+
+        " This sends the message to the UI
+        APPEND VALUE #( %tky = booking-%tky
+                        %msg = new_message_with_text(
+                                 severity = if_abap_behv_message=>severity-error
+                                 text     = 'The selected driver is not available!' )
+                      ) TO reported-booking.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
 ENDCLASS.
+

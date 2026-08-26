@@ -20,6 +20,7 @@ etag master LastChangedAt
 
   field ( mandatory ) CustomerName, PickupLocation, DropLocation, BookingDate, CurrencyCode;
 
+  validation validateDriverAvailability on save { field DriverId; create; update; }
 
   action AssignDriver result [1] $self;
   action StartTrip result [1] $self;
@@ -44,6 +45,7 @@ etag master LastChangedAt
     DropLocation = drop_location;
     BookingDate = booking_date;
     Status = status;
+    StatusCriticality = statuscriticality;
     CurrencyCode = currency_code;
     DriverId = driver_id;
     VehicleNumber = vehicle_number;

@@ -1,7 +1,6 @@
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @EndUserText.label: 'Driver Master Interface View'
 @Metadata.ignorePropagatedAnnotations: true
-/*+[hideWarning] { "IDS" : [ "KEY_CHECK" ]  } */
 define root view entity ZI_CIT_DRIVER
   as select from zcit_driver
 {
@@ -25,4 +24,3 @@ define root view entity ZI_CIT_DRIVER
   @Semantics.systemDateTime.localInstanceLastChangedAt: true
   local_last_changed_at as LocalLastChangedAt
 }
-//aravindhv.cs2022@citchennai.net

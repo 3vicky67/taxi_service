@@ -46,8 +46,9 @@ annotate view ZC_CIT_BOOKING with
   @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 50, label: 'Booking Date' }]
   BookingDate;
 
-  @UI.lineItem: [{ position: 60, label: 'Status' }]
-  @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 60, label: 'Status' }]
+  // --- Status Field with Color Criticality ---
+  @UI.lineItem: [{ position: 60, label: 'Status', criticality: 'StatusCriticality' }]
+  @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 60, label: 'Status', criticality: 'StatusCriticality' }]
   Status;
 
   @UI.fieldGroup: [{ qualifier: 'BookingDetailsGroup', position: 70, label: 'Currency' }]
@@ -69,25 +70,22 @@ annotate view ZC_CIT_BOOKING with
   
   @UI.fieldGroup: [{ qualifier: 'TripInfoGroup', position: 10, label: 'Driver ID' }]
   DriverId;
-  
+
+  @UI.lineItem: [{ position: 55, label: 'Driver Name' }] 
+  @UI.fieldGroup: [{ qualifier: 'TripInfoGroup', position: 15, label: 'Driver Name' }]
+  DriverName;
+
+  @UI.lineItem: [{ position: 56, label: 'Phone Number' }] 
+  @UI.fieldGroup: [{ qualifier: 'TripInfoGroup', position: 16, label: 'Phone Number' }]
+  PhoneNumber;
 
   @UI.fieldGroup: [{ qualifier: 'TripInfoGroup', position: 20, label: 'Vehicle Number' }]
   VehicleNumber;
 
   @UI.fieldGroup: [{ qualifier: 'TripInfoGroup', position: 30, label: 'Fare Amount' }]
   FareAmount;
-  
-  // Add this inside your MDE file
 
-  @UI.lineItem:       [{ position: 55 }] // Adjust position number as needed
-  @UI.identification: [{ position: 55 }]
-  DriverName;
-
-  @UI.lineItem:       [{ position: 56 }] 
-  @UI.identification: [{ position: 56 }]
-  PhoneNumber;
-
-  // --- Action Buttons (Visible at the top right) ---
+  // --- Action Buttons ---
   @UI.lineItem: [
     { type: #FOR_ACTION, dataAction: 'AssignDriver', label: 'Assign Driver', position: 100 },
     { type: #FOR_ACTION, dataAction: 'StartTrip', label: 'Start Trip', position: 110 },
